@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.2" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="压测," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.2" />
+
+
+
+
+
+
+<meta name="description" content="使用HBase的背景：传统数据库的数据量越来越大 单一数据库无法承受大量的并发访问，所以才有了数据库的读写分离，将数据库分为一个负责写的master库和多个负责读的slave库。因为分摊了 访问量，并且减少了锁的征用，可以减轻服务器压力。 数据量增大的时候就要分库，将部相关的表分开部署，就需要分库，这样join就不能用了，需要借助中间层。 数据量继续增大，分库也不能解决问题，就需要分表来解决，例如">
+<meta name="keywords" content="压测">
+<meta property="og:type" content="article">
+<meta property="og:title" content="测试HBase的调研">
+<meta property="og:url" content="http://yoursite.com/2018/01/18/测试HBase的调研/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="使用HBase的背景：传统数据库的数据量越来越大 单一数据库无法承受大量的并发访问，所以才有了数据库的读写分离，将数据库分为一个负责写的master库和多个负责读的slave库。因为分摊了 访问量，并且减少了锁的征用，可以减轻服务器压力。 数据量增大的时候就要分库，将部相关的表分开部署，就需要分库，这样join就不能用了，需要借助中间层。 数据量继续增大，分库也不能解决问题，就需要分表来解决，例如">
+<meta property="og:image" content="https://www.ibm.com/developerworks/cn/analytics/library/ba-1604-hbase-develop-practice/img01.jpg">
+<meta property="og:updated_time" content="2018-03-19T15:27:17.772Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="测试HBase的调研">
+<meta name="twitter:description" content="使用HBase的背景：传统数据库的数据量越来越大 单一数据库无法承受大量的并发访问，所以才有了数据库的读写分离，将数据库分为一个负责写的master库和多个负责读的slave库。因为分摊了 访问量，并且减少了锁的征用，可以减轻服务器压力。 数据量增大的时候就要分库，将部相关的表分开部署，就需要分库，这样join就不能用了，需要借助中间层。 数据量继续增大，分库也不能解决问题，就需要分表来解决，例如">
+<meta name="twitter:image" content="https://www.ibm.com/developerworks/cn/analytics/library/ba-1604-hbase-develop-practice/img01.jpg">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2018/01/18/测试HBase的调研/"/>
+
+
+
+
+
+  <title>测试HBase的调研 | Hexo</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Hexo</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            Startseite
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            Archiv
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            Tags
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/01/18/测试HBase的调研/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="John Doe">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Hexo">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">测试HBase的调研</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Veröffentlicht am</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-01-18T15:47:14+08:00">
+                2018-01-18
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h3 id="使用HBase的背景：传统数据库的数据量越来越大"><a href="#使用HBase的背景：传统数据库的数据量越来越大" class="headerlink" title="使用HBase的背景：传统数据库的数据量越来越大"></a>使用HBase的背景：传统数据库的数据量越来越大</h3><ul>
+<li>单一数据库无法承受大量的并发访问，所以才有了数据库的读写分离，将数据库分为一个负责写的master库和多个负责读的slave库。因为分摊了 访问量，并且减少了锁的征用，可以减轻服务器压力。</li>
+<li>数据量增大的时候就要分库，将部相关的表分开部署，就需要分库，这样join就不能用了，需要借助中间层。</li>
+<li>数据量继续增大，分库也不能解决问题，就需要分表来解决，例如，将表的id%10存储在10个表中，这样源表有1000万的数据分表后每张表里只有100万的数据，减轻的数据库表的大小，提高TPS性能。</li>
+</ul>
+<p>考虑到这些问题，HBase应运而生，对于大量的数据，只要加服务器的数量就行，HBase会自动水平切分扩展，跟hdfs的无缝集成保证了数据的可靠性和海量数据分析的高性能。应用场合就是可以实时读写超大规模的数据。</p>
+<h3 id="HBase架构："><a href="#HBase架构：" class="headerlink" title="HBase架构："></a>HBase架构：</h3><p><img src="https://www.ibm.com/developerworks/cn/analytics/library/ba-1604-hbase-develop-practice/img01.jpg" alt="image"></p>
+<ul>
+<li>逻辑存储模型：</li>
+</ul>
+<p>Hbase的表在逻辑上是一个稀疏表，该表也由行和列组成，但是每个列属于一个列族，行和列可以为唯一确定的存储单元叫元素。</p>
+<ul>
+<li>物理模型：</li>
+</ul>
+<p>将逻辑模型中和行进行分割，按列族存储。每个表会分割成多个region，一个region由多个store组成，一个store存储所有列族的数据。一个store有一个memStore和多个StoreFile组成，Store是以HFile的方式存储在HDFS上，这也保证了数据的冗余存储，进而保证了数据的可靠性。</p>
+<ul>
+<li>高并发的读写原因：</li>
+</ul>
+<p>使用日志文件和内存存储来将随机写改成顺序写（异步IO和缓存机制），保证稳定的数据插入速率，读写独立，没有冲突。</p>
+<ul>
+<li>物理组成：</li>
+</ul>
+<p>HBase的物理组成：hdfs(NameNode+DataNode)+zookeeper(HQuorumPeer)+hbase(HMaster+HRegionServer)</p>
+<h3 id="现在HBase的应用场景："><a href="#现在HBase的应用场景：" class="headerlink" title="现在HBase的应用场景："></a>现在HBase的应用场景：</h3><ul>
+<li>腾讯：HBase在几次营销活动（炫舞拉新活动、天天库跑新版预热活动、英雄联盟三周年活动等）中，从几十亿甚至几百亿条数据中实时拉取数据在毫秒级相应，成为营销活动的新渠道。  还有广告日志的处理，腾讯每天通过HBase处理百亿级的广告请求和曝光日志，访问HBase的延时80%在20ms内。此外，Hbase在其他点击交互日志或监控日志系统也有较多应用：如网络会话数据，秒级监控平台日志，微信支付日志等。</li>
+<li>阿里：2010年开始使用HBase，Hbase是 阿里的核心存储系统，它和计算引擎紧密结合，主要服务搜索和推荐的业务。</li>
+<li>其他应用：《HBase在智能电网异构数据同步中的应用》、《基于 HBase的工业日志系统设计与实现》、《基于 HBase 的旅馆业治安管理信息系统架构分析与设计》、《基于HBase的医疗卫生数据中心的构建与异构数据库同步的研究》</li>
+</ul>
+<h3 id="为什么要对HBase进行压力测试？"><a href="#为什么要对HBase进行压力测试？" class="headerlink" title="为什么要对HBase进行压力测试？"></a>为什么要对HBase进行压力测试？</h3><p>No SQL数据库在大数据处理领域得到越越多的应用，国内外学者也分别提出了对 No SQL 数据库进行性能测试的方法，然而针对 HBase 数据库进行性能测试的研究相对较少。</p>
+<p>故障：2008 年，Amazon 的 S3服务出现长达近 8 个半小时的故障，导致全球部分地区用户无法访问其服务；2009 年，Google 公司的 GAE 出现严重故障，导致全球用户均无法正访问 GAE 网站。这些故障导致个巨大的损失。因此，在对于大数据库的压力测试在投入使用之前就显得特别重要。</p>
+<p>开源测试工具：YCSB。它可以用来测试HBase、MongoDB、Redis等缓存数据库和分布式数据库。它用一条命令就可以执行对数据库的测试。如<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">./ycsb load hbase -P ../workloads/workloada -p threads=10 -p columnfamily=f1 -p recordcount=50000 -s &gt; load.dat</span><br></pre></td></tr></table></figure></p>
+<p>这条命令，它可以分配只读，只写，读写操作，分配Threads数量，recordcount表示本次加载的数据条数。最后将测试结果存入文件。测试的结果有测试时间、平均延时、最小延时、最大延时等数据。</p>
+<p>还有就是Apache的JMeter，这是一个开源的跨平台测试工具，是一个成熟的测试架构，稳定可靠。具体是针对restful接口进行测试。</p>
+<p>相关论文：《HBase数据库评测关键技术的研究》、《架构及业务驱动的HBase测试方法研究》都使用了YCSB测试工具对HBase进行测试。</p>
+<h3 id="创新点："><a href="#创新点：" class="headerlink" title="创新点："></a>创新点：</h3><p>我们可以自己设计一个测试工具对HBase进行测试。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/压测/" rel="tag"># 压测</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/11/14/visite-dm/" rel="next" title="ubuntu16.04通过odbc（用的C++）访问另一台centos上的达梦数据库">
+                <i class="fa fa-chevron-left"></i> ubuntu16.04通过odbc（用的C++）访问另一台centos上的达梦数据库
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/03/17/操作系统/" rel="prev" title="操作系统">
+                操作系统 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            Inhaltsverzeichnis
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            Übersicht
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.gif"
+               alt="John Doe" />
+          <p class="site-author-name" itemprop="name">John Doe</p>
+           
+              <p class="site-description motion-element" itemprop="description"></p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives/">
+                <span class="site-state-item-count">6</span>
+                <span class="site-state-item-name">Artikel</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">1</span>
+                <span class="site-state-item-name">Kategorien</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">4</span>
+                <span class="site-state-item-name">Tags</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#使用HBase的背景：传统数据库的数据量越来越大"><span class="nav-number">1.</span> <span class="nav-text">使用HBase的背景：传统数据库的数据量越来越大</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#HBase架构："><span class="nav-number">2.</span> <span class="nav-text">HBase架构：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#现在HBase的应用场景："><span class="nav-number">3.</span> <span class="nav-text">现在HBase的应用场景：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#为什么要对HBase进行压力测试？"><span class="nav-number">4.</span> <span class="nav-text">为什么要对HBase进行压力测试？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#创新点："><span class="nav-number">5.</span> <span class="nav-text">创新点：</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">John Doe</span>
+</div>
+
+
+<div class="powered-by">
+  Erstellt mit  <a class="theme-link" href="https://hexo.io">Hexo</a>
+</div>
+
+<div class="theme-info">
+  Theme -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Muse
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.2"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

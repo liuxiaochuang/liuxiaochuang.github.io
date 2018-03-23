@@ -1,0 +1,724 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.2" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="压测," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.2" />
+
+
+
+
+
+
+<meta name="description" content="背景我的项目中需要C++访问达梦数据库，所以花了很大功夫来实现这个功能。通过和达梦官方的邮件联系之后，得知现在达梦数据库（dm7）是不能在ubuntu版本的linux上安装server的，但是client还是可以安装在ubuntu上的。所以可以通过odbc来访问安装在centos上的达梦数据库。 服务端达梦的安装在centos上安装的教程如下连接：http://blog.csdn.net/alle">
+<meta name="keywords" content="压测">
+<meta property="og:type" content="article">
+<meta property="og:title" content="ubuntu16.04通过odbc（用的C++）访问另一台centos上的达梦数据库">
+<meta property="og:url" content="http://yoursite.com/2017/11/14/visite-dm/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="背景我的项目中需要C++访问达梦数据库，所以花了很大功夫来实现这个功能。通过和达梦官方的邮件联系之后，得知现在达梦数据库（dm7）是不能在ubuntu版本的linux上安装server的，但是client还是可以安装在ubuntu上的。所以可以通过odbc来访问安装在centos上的达梦数据库。 服务端达梦的安装在centos上安装的教程如下连接：http://blog.csdn.net/alle">
+<meta property="og:updated_time" content="2018-03-19T15:27:17.771Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="ubuntu16.04通过odbc（用的C++）访问另一台centos上的达梦数据库">
+<meta name="twitter:description" content="背景我的项目中需要C++访问达梦数据库，所以花了很大功夫来实现这个功能。通过和达梦官方的邮件联系之后，得知现在达梦数据库（dm7）是不能在ubuntu版本的linux上安装server的，但是client还是可以安装在ubuntu上的。所以可以通过odbc来访问安装在centos上的达梦数据库。 服务端达梦的安装在centos上安装的教程如下连接：http://blog.csdn.net/alle">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2017/11/14/visite-dm/"/>
+
+
+
+
+
+  <title>ubuntu16.04通过odbc（用的C++）访问另一台centos上的达梦数据库 | Hexo</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Hexo</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            Startseite
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            Archiv
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            Tags
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/11/14/visite-dm/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="John Doe">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Hexo">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">ubuntu16.04通过odbc（用的C++）访问另一台centos上的达梦数据库</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Veröffentlicht am</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-11-14T10:39:54+08:00">
+                2017-11-14
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">in</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/技术/" itemprop="url" rel="index">
+                    <span itemprop="name">技术</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h3 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h3><p>我的项目中需要C++访问达梦数据库，所以花了很大功夫来实现这个功能。<br>通过和达梦官方的邮件联系之后，得知现在达梦数据库（dm7）是不能在ubuntu版本的linux上安装server的，但是client还是可以安装在ubuntu上的。所以可以通过odbc来访问安装在centos上的达梦数据库。</p>
+<h3 id="服务端达梦的安装"><a href="#服务端达梦的安装" class="headerlink" title="服务端达梦的安装"></a>服务端达梦的安装</h3><p>在centos上安装的教程如下连接：<a href="http://blog.csdn.net/allens_zhou/article/details/8575400" target="_blank" rel="noopener">http://blog.csdn.net/allens_zhou/article/details/8575400</a></p>
+<h3 id="ubuntu客户端配置："><a href="#ubuntu客户端配置：" class="headerlink" title="ubuntu客户端配置："></a>ubuntu客户端配置：</h3><h4 id="首先要安装unixODBC，网上有教程；"><a href="#首先要安装unixODBC，网上有教程；" class="headerlink" title="首先要安装unixODBC，网上有教程；"></a>首先要安装unixODBC，网上有教程；</h4><p>然后安装soci，这是它的官网：soci.sourceforge.net/doc/3.2/，具体安装使用过程网上也有教程。</p>
+<h4 id="然后配置odbc-manager和odbc-driver"><a href="#然后配置odbc-manager和odbc-driver" class="headerlink" title="然后配置odbc manager和odbc driver"></a>然后配置odbc manager和odbc driver</h4><p>这个博客对我的帮助很大：<a href="http://www.itpub.net/thread-1824202-1-1.html，它指明了配置达梦odbc可以不需要libdmOdbcSet.so这个库，只要libdodbc.so就行了。具体操作见下：" target="_blank" rel="noopener">http://www.itpub.net/thread-1824202-1-1.html，它指明了配置达梦odbc可以不需要libdmOdbcSet.so这个库，只要libdodbc.so就行了。具体操作见下：</a></p>
+<ul>
+<li>安装完odbc后，odbcinst –j 来查看安装位置等信息</li>
+<li>配置 odbcinst.ini，作用就是注册DM7的ODBC驱动,该驱动名称为DM7，内容如下：<br>[DM7]<br>Description = dm odbc<br>Driver = /opt/dmdbms/bin/libdodbc.so</li>
+<li>配置 odbc.ini，作用就是创建系统DSN，名称为dm，调用名为DM7的ODBC驱动，内容如下：<br>[dm]<br>Description = dm7 dsn<br>Driver = DM7<br>SERVER =127.0.0.1<br>UID = SYSDBA<br>PWD = SYSDBA<br>TCP_PORT = 5236</li>
+<li>配置完成之后，直接在终端运行：isql dm来测试，如果返回以下信息，测说明配置成功：<br>[root@localhost opt]# isql dm<br>+—————————————+<br>| Connected!                            |<br>|                                       |<br>| sql-statement                         |<br>| help [tablename]                      |<br>| quit                                  |<br>|                                       |<br>+—————————————+</li>
+<li>还可以建表，如create table student (id int, name char(128), score int)</li>
+<li>插入数据: insert into student (id, name, score) values (1,’myname’, 100)</li>
+</ul>
+<h3 id="C-通过soci访问达梦例子："><a href="#C-通过soci访问达梦例子：" class="headerlink" title="C++通过soci访问达梦例子："></a>C++通过soci访问达梦例子：</h3><p>main.cpp:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line">#include &lt;soci/soci.h&gt;</span><br><span class="line">#include &lt;soci/odbc/soci-odbc.h&gt;</span><br><span class="line">#include&lt;soci/mysql/soci-mysql.h&gt;</span><br><span class="line">#include &lt;soci/postgresql/soci-postgresql.h&gt;</span><br><span class="line">#include&lt;iostream&gt;</span><br><span class="line">#include&lt;istream&gt;</span><br><span class="line">#include&lt;ostream&gt;</span><br><span class="line">#include&lt;string&gt;</span><br><span class="line">#include&lt;exception&gt;</span><br><span class="line">#include&lt;unistd.h&gt;</span><br><span class="line"></span><br><span class="line">using namespace std;</span><br><span class="line">using namespace soci;</span><br><span class="line"></span><br><span class="line">int main() &#123;</span><br><span class="line">//	session sql(&quot;mysql://host=127.0.0.1 dbname=student user=root password=123&quot;);//建立连接</span><br><span class="line"></span><br><span class="line">//	connection_pool pool(10);</span><br><span class="line">//	for (int i=0; i&lt;10; i++) &#123;</span><br><span class="line">//		session &amp;sql = pool.at(i);</span><br><span class="line">//		sql.open</span><br><span class="line">//	&#125;</span><br><span class="line">	session sql(&quot;odbc://DSN=dm&quot;);</span><br><span class="line">	session sql0(odbc, &quot;DSN=dm&quot;);</span><br><span class="line">	session sql1(odbc, &quot;DSN=dm&quot;);</span><br><span class="line">	unsigned id=0;</span><br><span class="line">	string name(&quot;lxc_00&quot;);</span><br><span class="line">	int score=100;</span><br><span class="line">	try &#123;</span><br><span class="line">		sql&lt;&lt;&quot;insert into student (id, name, score) values (:item_0,:item_1, :item_2)&quot;, use(id,&quot;item_0&quot;),use(name,&quot;item_1&quot;), use(score, &quot;item_2&quot;);</span><br><span class="line">	&#125; catch (exception const &amp; e) &#123;</span><br><span class="line">		cerr&lt;&lt;&quot;Error::&quot;&lt;&lt;e.what()&lt;&lt;endl;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	sql.close();</span><br><span class="line">	sql0.close();</span><br><span class="line">	sql1.close();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>makefile:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">all = all</span><br><span class="line">cc = g++ -std=c++11 -Wall -g</span><br><span class="line">source = main.cpp</span><br><span class="line">LIB = -lpq -lsoci_core -lsoci_postgresql -lmysqlclient -ldl -lpthread -lsoci_odbc</span><br><span class="line">INCLUDE = -I/usr/include/mysql  </span><br><span class="line"></span><br><span class="line">$(all): $(source)</span><br><span class="line">		$(cc) -o main $(source) $(LIB) $(INCLUDE)</span><br><span class="line">clean:</span><br><span class="line">	rm *.o</span><br></pre></td></tr></table></figure>
+<p>这样就可以用C++访问达梦了！</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/压测/" rel="tag"># 压测</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/11/06/leetcode-135-Candy/" rel="next" title="leetcode-135-Candy">
+                <i class="fa fa-chevron-left"></i> leetcode-135-Candy
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/01/18/测试HBase的调研/" rel="prev" title="测试HBase的调研">
+                测试HBase的调研 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            Inhaltsverzeichnis
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            Übersicht
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.gif"
+               alt="John Doe" />
+          <p class="site-author-name" itemprop="name">John Doe</p>
+           
+              <p class="site-description motion-element" itemprop="description"></p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives/">
+                <span class="site-state-item-count">6</span>
+                <span class="site-state-item-name">Artikel</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">1</span>
+                <span class="site-state-item-name">Kategorien</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">4</span>
+                <span class="site-state-item-name">Tags</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#背景"><span class="nav-number">1.</span> <span class="nav-text">背景</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#服务端达梦的安装"><span class="nav-number">2.</span> <span class="nav-text">服务端达梦的安装</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ubuntu客户端配置："><span class="nav-number">3.</span> <span class="nav-text">ubuntu客户端配置：</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#首先要安装unixODBC，网上有教程；"><span class="nav-number">3.1.</span> <span class="nav-text">首先要安装unixODBC，网上有教程；</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#然后配置odbc-manager和odbc-driver"><span class="nav-number">3.2.</span> <span class="nav-text">然后配置odbc manager和odbc driver</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#C-通过soci访问达梦例子："><span class="nav-number">4.</span> <span class="nav-text">C++通过soci访问达梦例子：</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">John Doe</span>
+</div>
+
+
+<div class="powered-by">
+  Erstellt mit  <a class="theme-link" href="https://hexo.io">Hexo</a>
+</div>
+
+<div class="theme-info">
+  Theme -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Muse
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.2"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

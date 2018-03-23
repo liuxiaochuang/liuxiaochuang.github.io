@@ -1,0 +1,899 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.2" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="基础," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.2" />
+
+
+
+
+
+
+<meta name="description" content="OSI参考模型 物理层：传输比特流，有多种接口标准，网线接口就是其中之一 传输层：传输帧，有成帧、差错控制、流量控制、传输管理功能。 网络层：传输数据报，关键功能是路由选择，并实现拥塞控制、流量控制、差错控制、网际互连。该层协议有IP、IPX、ICMP、ARP、OSPF等 传输层：传输报文段（TCP）或者数据报（UDP)，进程通信，提供流量控制、差错控制、服务质量等功能。 会话层：session，">
+<meta name="keywords" content="基础">
+<meta property="og:type" content="article">
+<meta property="og:title" content="计算机网络">
+<meta property="og:url" content="http://yoursite.com/2018/03/21/计算机网络/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="OSI参考模型 物理层：传输比特流，有多种接口标准，网线接口就是其中之一 传输层：传输帧，有成帧、差错控制、流量控制、传输管理功能。 网络层：传输数据报，关键功能是路由选择，并实现拥塞控制、流量控制、差错控制、网际互连。该层协议有IP、IPX、ICMP、ARP、OSPF等 传输层：传输报文段（TCP）或者数据报（UDP)，进程通信，提供流量控制、差错控制、服务质量等功能。 会话层：session，">
+<meta property="og:updated_time" content="2018-03-20T16:57:22.619Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="计算机网络">
+<meta name="twitter:description" content="OSI参考模型 物理层：传输比特流，有多种接口标准，网线接口就是其中之一 传输层：传输帧，有成帧、差错控制、流量控制、传输管理功能。 网络层：传输数据报，关键功能是路由选择，并实现拥塞控制、流量控制、差错控制、网际互连。该层协议有IP、IPX、ICMP、ARP、OSPF等 传输层：传输报文段（TCP）或者数据报（UDP)，进程通信，提供流量控制、差错控制、服务质量等功能。 会话层：session，">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2018/03/21/计算机网络/"/>
+
+
+
+
+
+  <title>计算机网络 | Hexo</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Hexo</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            Startseite
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            Archiv
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            Tags
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/03/21/计算机网络/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="John Doe">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Hexo">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">计算机网络</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Veröffentlicht am</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-03-21T00:55:07+08:00">
+                2018-03-21
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">in</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/技术/" itemprop="url" rel="index">
+                    <span itemprop="name">技术</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h4 id="OSI参考模型"><a href="#OSI参考模型" class="headerlink" title="OSI参考模型"></a>OSI参考模型</h4><ul>
+<li>物理层：传输比特流，有多种接口标准，网线接口就是其中之一</li>
+<li>传输层：传输帧，有成帧、差错控制、流量控制、传输管理功能。</li>
+<li>网络层：传输数据报，关键功能是路由选择，并实现拥塞控制、流量控制、差错控制、网际互连。该层协议有IP、IPX、ICMP、ARP、OSPF等</li>
+<li>传输层：传输报文段（TCP）或者数据报（UDP)，进程通信，提供流量控制、差错控制、服务质量等功能。</li>
+<li>会话层：session，建立不同主机各进程上的会话，实现有序数据传输</li>
+<li>表示层：信息交换方式，数据压缩，加密，等</li>
+<li>应用层：</li>
+</ul>
+<h4 id="物理层"><a href="#物理层" class="headerlink" title="物理层"></a>物理层</h4><ul>
+<li>概念：数据、信号、码元，信源、信道、信宿，速率、波特、带宽，奈奎斯特定理和香农定理，编码与调制，电路交换、报文交换和分组交换，双绞线、同轴电缆、光纤、无线</li>
+<li>中继器、集线器</li>
+</ul>
+<h4 id="链路层"><a href="#链路层" class="headerlink" title="链路层"></a>链路层</h4><ul>
+<li>组帧：字符计数法、字符填充的首尾界定法、比特填充的首尾界定法</li>
+<li>差错控制：奇偶校验、CRC，纠错：海明</li>
+<li>流量控制：停止-等待，滑动窗口（单帧和多帧的go back N帧）</li>
+<li>介质访问控制：<ul>
+<li>分类：频分复用、时分复用、波分复用、码分复用</li>
+<li>随机访问介质：ALOHA协议，CSMA（坚持和非坚持）、CSMA/CD（先听后发、边听边发、冲突停发、随机重发）、CSMA/CA。</li>
+<li>轮询访问介质：令牌传递</li>
+</ul>
+</li>
+<li>局域网（LAN)，包含以太网、令牌网和FDDI网，现在一般指以太网<ul>
+<li>以太网：MAC地址、MAC帧64～1500Byte、速度有100M 1G和10G等</li>
+<li>IEEE 820.11：无线局域网</li>
+</ul>
+</li>
+<li>广域网：距离广包含PPP协议和HDLC协议</li>
+<li>网桥、交换机</li>
+</ul>
+<h4 id="网络层"><a href="#网络层" class="headerlink" title="网络层"></a>网络层</h4><ul>
+<li>路由算法：<ul>
+<li>静态路由算法</li>
+<li>动态路由算法<ul>
+<li>距离-向量（每个节点有相邻节点距离）</li>
+<li>链路状态（每个节点有全网络信息）</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>IPv4<ul>
+<li>报文结构<ul>
+<li>版本：ipv4</li>
+<li>首部长度：20Byte</li>
+<li>总长度（2Byte）：最大65535Byte</li>
+<li>标识（16位）：相同数据报的标识相同</li>
+<li>标志（3位）：MF、DF。分片相关</li>
+<li>片偏移（13位）：某片在原分组中的相对位置，以8字节为单位</li>
+<li>首部校验和（16位）：校验首部</li>
+<li>生存时间（TTL，8位）：减为0丢弃</li>
+<li>协议（8位）：TCP还是UDP</li>
+<li>源IP和目的IP各占4Byte</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>NAT将局域网地址转换为公网地址</li>
+<li>子网、子网掩码（and运算得到子网）、CIDR（无分类编址）</li>
+<li>ARP协议（地址解析协议）：每个主机有ARP表来存放该局域网内ip到mac的映射，一开始需要广播寻找目的ip的MAC。</li>
+<li>动态主机配置协议（DHCP）：一台主机加入网络不需要手工参与，要有DHCP服务器</li>
+<li>网际控制报ICMP：ping</li>
+<li>路由协议：<ul>
+<li>自治系统：路由算法不同的路由器组成</li>
+<li>内部网关协议<ul>
+<li>RIP：距离向量</li>
+<li>OSPF：链路状态</li>
+</ul>
+</li>
+<li>外部网关协议：BGP</li>
+</ul>
+</li>
+<li>组播：把视频内容传递给一个子网，但是只传递一份到路由器</li>
+<li>多播：一个路由器发送给多个ip视频</li>
+</ul>
+<h4 id="传输层"><a href="#传输层" class="headerlink" title="传输层"></a>传输层</h4><ul>
+<li>UDP报文：<ul>
+<li>报文结构：<ul>
+<li>伪首部：源ip目的ip，为了校验ip和端口</li>
+<li>源、目的端口号（各16位）</li>
+<li>udp报文长度：16位，最大65535字节</li>
+<li>udp校验：</li>
+<li>数据：可有可无</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>TCP报文：首部（20字节）和数据<ul>
+<li>源目的端口各占16位</li>
+<li>序号：4字节32位，该数据的序号</li>
+<li>确认号：4字节32位，期望收到的下一个序号</li>
+<li>数据偏移（首部长度）：4位，以4字节为单位，最大15×4=60字节</li>
+<li>保留字段：6位，还没使用</li>
+<li>紧急位URG：</li>
+<li>确认位ACK：</li>
+<li>推送位PUSH：</li>
+<li>复位位RST：TCP出现严重错误，断开重连</li>
+<li>同步位：SYN</li>
+<li>终止位FIN</li>
+<li>窗口字段：16位2字节，告诉对方下次发送的报文长度，用在流量控制</li>
+<li>检验和：16位2字节，要加伪首部</li>
+<li>紧急指针：16位2字节本报文段中紧急数据有多少自己</li>
+<li>选项字段：长度可变，</li>
+<li>填充字段：使首部长度为4字节整数倍</li>
+</ul>
+</li>
+<li><p>三次握手：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">sequenceDiagram</span><br><span class="line"></span><br><span class="line">client-&gt;&gt;server: SYN</span><br><span class="line">server-&gt;&gt;client: SYN，ack</span><br><span class="line">client-&gt;&gt;server: ack</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>四次挥手：</p>
+</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">sequenceDiagram</span><br><span class="line">A-&gt;&gt;B: FIN</span><br><span class="line">B-&gt;&gt;A: ack</span><br><span class="line">B-&gt;&gt;A: 数据</span><br><span class="line">B-&gt;&gt;A: FIN</span><br><span class="line">A-&gt;&gt;B: ack（time_wait）</span><br></pre></td></tr></table></figure>
+<ul>
+<li>time_wait：时间很长，window下是240s<ul>
+<li>产生原因：实现tcp全双工安全释放；使旧数据包在网络中因过期而释放</li>
+<li>具体场景：一般是client端，而且会占用port，有时产生于server端，是因为server主动关闭连接发生异常</li>
+</ul>
+</li>
+</ul>
+<ul>
+<li>流量控制：窗口字段</li>
+<li>拥塞控制：<ul>
+<li>慢开始：开始的很快</li>
+<li>拥塞避免算法：加法增大</li>
+<li>网络拥塞处理：将门限值ssthresh减半，拥塞窗口设为1</li>
+</ul>
+</li>
+</ul>
+<h4 id="应用层"><a href="#应用层" class="headerlink" title="应用层"></a>应用层</h4><ul>
+<li>网络模型：C/S和p2p</li>
+<li>DNS：端口53</li>
+<li>FTP</li>
+<li>电子邮件：SMTP、POP3</li>
+<li>HTTP：HTTP协议定义了浏览器如何将请求发送给服务器，服务器如何将应答发送给浏览器<ul>
+<li>访问流程：DNS解析找到服务器ip–&gt;建立TCP连接–&gt;发送http请求报文–&gt;得到http报文响应–&gt;释放tcp连接</li>
+</ul>
+</li>
+<li>http</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>-</th>
+<th>GET</th>
+<th>POST</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>后退</td>
+<td>可以</td>
+<td>数据重新提交</td>
+</tr>
+<tr>
+<td>书签</td>
+<td>可以收藏</td>
+<td>不可以收藏为书签</td>
+</tr>
+<tr>
+<td>缓存</td>
+<td>可以缓存</td>
+<td>不可以</td>
+</tr>
+<tr>
+<td>编码类型</td>
+<td>application/x-www-form-urlencoded</td>
+<td>application/x-www-form-urlencoded或者多重编码，二进制时是使用多重编码</td>
+</tr>
+<tr>
+<td>历史</td>
+<td>参数保留在历史中</td>
+<td>参数不能保留在历史中</td>
+</tr>
+<tr>
+<td>数据长度限制</td>
+<td>放在url中，长度有限</td>
+<td>无限制</td>
+</tr>
+<tr>
+<td>数据类型</td>
+<td>ASCII字节码</td>
+<td>没有限制，可以二进制</td>
+</tr>
+<tr>
+<td>安全性</td>
+<td>不安全</td>
+<td>安全</td>
+</tr>
+<tr>
+<td>可见性</td>
+<td>url中可见</td>
+<td>在body中</td>
+</tr>
+</tbody>
+</table>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/基础/" rel="tag"># 基础</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/03/17/操作系统/" rel="next" title="操作系统">
+                <i class="fa fa-chevron-left"></i> 操作系统
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            Inhaltsverzeichnis
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            Übersicht
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.gif"
+               alt="John Doe" />
+          <p class="site-author-name" itemprop="name">John Doe</p>
+           
+              <p class="site-description motion-element" itemprop="description"></p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives/">
+                <span class="site-state-item-count">6</span>
+                <span class="site-state-item-name">Artikel</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">1</span>
+                <span class="site-state-item-name">Kategorien</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">4</span>
+                <span class="site-state-item-name">Tags</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#OSI参考模型"><span class="nav-number">1.</span> <span class="nav-text">OSI参考模型</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#物理层"><span class="nav-number">2.</span> <span class="nav-text">物理层</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#链路层"><span class="nav-number">3.</span> <span class="nav-text">链路层</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#网络层"><span class="nav-number">4.</span> <span class="nav-text">网络层</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#传输层"><span class="nav-number">5.</span> <span class="nav-text">传输层</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#应用层"><span class="nav-number">6.</span> <span class="nav-text">应用层</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">John Doe</span>
+</div>
+
+
+<div class="powered-by">
+  Erstellt mit  <a class="theme-link" href="https://hexo.io">Hexo</a>
+</div>
+
+<div class="theme-info">
+  Theme -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Muse
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.2"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
